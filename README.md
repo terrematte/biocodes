@@ -1,2 +1,2 @@
 # biocodes
-Bunch of useful codes in Bioinformatics
+Bunch of useful codes for Bioinformatics
