@@ -88,3 +88,9 @@ query <- GDCquery(project = "TCGA-KIRC",
 biomartCacheClear() 
 GDCdownload(query, files.per.chunk = 100)
 data <- GDCprepare(query)
+
+#'-----------------------------------------------------------------
+## TCGABiolinks - Mutation Data   ----
+#'
+
+KIRC.maf <- GDCquery_Maf("KIRC", pipelines = "muse")
