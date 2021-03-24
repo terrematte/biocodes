@@ -2,10 +2,13 @@
 # RTCGAToolbox ----
 #'-----------------------------------------------------------------
 packages_bioconductor = c("SummarizedExperiment", "RTCGAToolbox")
-if (!require(x, character.only = TRUE)) {
-  BiocManager::install(x, dependencies = TRUE)
-  library(x, character.only = TRUE)
-}
+# install packages
+package.check <- lapply(packages_bioconductor, FUN = function(x) {
+  if (!require(x, character.only = TRUE)) {
+    BiocManager::install(x, dependencies = TRUE)
+    library(x, character.only = TRUE)
+  }
+})
 
 # Show all datasets
 getFirehoseDatasets()
