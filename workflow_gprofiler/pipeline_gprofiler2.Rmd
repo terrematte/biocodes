@@ -1,0 +1,54 @@
+---
+title: "Workflow of gprofiler"
+author: "Patrick Terrematte"
+date: "2023-09-26"
+output: html_document
+---
+
+## Gene list functional enrichment analysis and namespace conversion with gprofiler2
+
+gprofiler2 provides an R interface to the widely used web toolset g:Profiler (https://biit.cs.ut.ee/gprofiler) [1].
+
+See <https://cran.r-project.org/web/packages/gprofiler2/vignettes/gprofiler2.html>.
+
+# Installation and loading
+
+
+```{r }
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	include = FALSE,
+	results='hide'
+)
+
+if (!require("gprofiler2", quietly = TRUE))
+    install.packages("gprofiler2")
+
+library(gprofiler2)
+```
+
+```{r}
+gostres <- gost(query = c("X:1000:1000000", "rs17396340", "GO:0005005", "ENSG00000156103", "NLRP1"),
+organism = "hsapiens")
+
+# The result is a named list where “result” is a data.frame with the enrichment analysis results
+# and “meta” containing a named list with all the metadata for the query.
+head(gostres$result)
+```
+
+
+```{r}
+g <- gostplot(gostres, capped = TRUE, interactive = TRUE)
+
+htmlwidgets::saveWidget(g, "gostplot_html/index.html")
+
+```
+
+
+```{r}
+p <- gostplot(gostres, capped = FALSE, interactive = FALSE)
+pp <- publish_gostplot(p, highlight_terms = c("GO:0048013", "REAC:R-HSA-3928663"), 
+                       width = NA, height = NA, filename = 'gostplot_html/gostplot.png' )
+```
+

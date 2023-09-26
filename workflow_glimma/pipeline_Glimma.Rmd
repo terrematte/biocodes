@@ -1,0 +1,106 @@
+---
+title: "Introduction using limma or edgeR"
+author: "Patrick Terrematte"
+date: "2023-09-26"
+output: html_document
+---
+
+
+# Glimma
+
+This package generates interactive visualisations for analysis of RNA-sequencing data using output from limma, edgeR or DESeq2 packages in an HTML page. The interactions are built on top of the popular static representations of analysis results in order to provide additional information.
+
+https://www.bioconductor.org/packages/release/bioc/html/Glimma.html 
+
+https://www.bioconductor.org/packages/release/bioc/vignettes/Glimma/inst/doc/DESeq2.html
+
+# Installing and loading packages
+
+```{r setup, error=TRUE, message=FALSE, warning=FALSE, include=FALSE, purl=FALSE, results='hide'}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	include = FALSE
+)
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+if (!require("Glimma", quietly = TRUE))
+    BiocManager::install("Glimma")
+
+library(Glimma) 
+library(edgeR)
+library(DESeq2)
+```
+## Loading Differential expression Data
+
+The DGEList object from the workflow has been included with the package as internal data. 
+We will convert this to a DESeq data object.
+
+```{r}
+dge <- readRDS(system.file("RNAseq123/dge.rds", package = "Glimma"))
+
+dds <- DESeqDataSetFromMatrix(
+  countData = dge$counts,
+  colData = dge$samples,
+  rowData = dge$genes,
+  design = ~group
+)
+#> converting counts to integer mode
+```
+
+## MDS Plot
+
+The multidimensional scaling (MDS) plot is frequently used to explore differences in samples. When data has been MDS transformed, the first two dimensions explain the greatest variance between samples, and the amount of variance decreases monotonically with increasing dimension.
+
+The Glimma MDS contains two main components:
+
+    1. a plot showing two MDS dimensions, and
+    2. a plot of the eigenvalues of each dimension
+
+The Glimma MDS allows different dimensions to be plotted against each other, with the proportion of variability explained by each dimension highlighted in the barplot alongside it. The interactive MDS plot can be created simply with a single argument for a DESeqDataSet object. The points in the MDS plot can have their size, colour and shape changed based on the information that is stored in the colData of the DESeqDataSet.
+
+```{r}
+glimmaMDS(dds)
+
+htmlwidgets::saveWidget(glimmaMDS(dds), "glimma_html/MDS-plot.html")
+```
+
+## MA plot
+
+The MA plot is a visualisation that plots the log-fold-change between experimental groups (M) against the mean expression across all the samples (A) for each gene.
+
+The Glimma MA plot contains two main components:
+
+    1. a plot of summary statistics across all genes that have been tested, and
+    2. a plot of gene expression from individual samples for a given gene
+
+The second plot shows gene expression from the last selected sample, which can be selected from the table or directly from the summary plot.
+
+To create the MA plot we first need to run differential expression (DE) analysis for our data using the DESeq function.
+
+```{r}
+dds_de <- DESeq(dds, quiet=TRUE)
+
+```
+
+The MA plot can then be created using the dds object that now contains fitted results and the gene counts.
+
+```{r}
+glimmaMA(dds_de)
+
+htmlwidgets::saveWidget(glimmaMA(dds_de), "glimma_html/MA-plot.html")
+```
+
+## Volcano Plot
+
+A popular alternative to the MA plot for plotting the output of differential expression analysis the the volcano plot. This can be produced using the glimmaVolcano function and the same arguments as the glimmaMA.
+
+```{r}
+glimmaVolcano(dds_de)
+
+htmlwidgets::saveWidget(glimmaVolcano(dds_de), "glimma_html/Volcano-plot.html")
+
+```
+
