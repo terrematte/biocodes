@@ -1,0 +1,5 @@
+*.RData
+*.nb.html
+*.pdf
+.data_tmp/*
+tmp-pdfcrop-454.tex
